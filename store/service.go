@@ -35,3 +35,18 @@ func InitializeStore() *StorageService {
 	storeService.redisClient = redisClient
 	return storeService
 }
+
+func SaveURLMapping(shortUrl string, originalUrl string, userID string) {
+	err := storeService.redisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
+	if err != nil {
+		panic(fmt.Sprintf("Gurl is feeling lonely, can't save URL mapping: %v", err))
+	}
+}
+
+func RetrieveInitialURL(shortUrl string) string {
+	val, err := storeService.redisClient.Get(ctx, shortUrl).Result()
+	if err != nil {
+		panic(fmt.Sprintf("Gurl is feeling lonely, can't retrieve URL mapping: %v", err))
+	}
+	return val
+}
